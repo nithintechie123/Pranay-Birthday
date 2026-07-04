@@ -56,12 +56,17 @@ body {
   animation: button-breathe 2.6s ease-in-out infinite;
 }
 
+.music-player {
+  animation: music-float 3.2s ease-in-out infinite;
+}
+
 .spin-glow {
   animation: glow-spin 8s linear infinite;
 }
 
 .photo-flip {
   perspective: 1300px;
+  touch-action: manipulation;
 }
 
 .photo-flip-inner {
@@ -69,10 +74,15 @@ body {
   transition: transform 900ms cubic-bezier(0.2, 0.72, 0.22, 1);
 }
 
-.photo-flip:hover .photo-flip-inner,
 .photo-flip:focus-visible .photo-flip-inner,
 .photo-flip.is-flipped .photo-flip-inner {
   transform: rotateY(180deg);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .photo-flip:hover .photo-flip-inner {
+    transform: rotateY(180deg);
+  }
 }
 
 .photo-face {
@@ -237,6 +247,19 @@ body {
 
   50% {
     box-shadow: 0 0 28px rgba(255, 122, 162, 0.28);
+  }
+}
+
+@keyframes music-float {
+  0%,
+  100% {
+    transform: translateY(0);
+    box-shadow: 0 0 0 rgba(125, 211, 252, 0);
+  }
+
+  50% {
+    transform: translateY(-4px);
+    box-shadow: 0 0 28px rgba(125, 211, 252, 0.18);
   }
 }
 

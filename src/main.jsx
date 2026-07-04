@@ -1,10 +1,73 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { Camera, Gift, Heart, Music2, Rotate3D, Sparkles, Star } from 'lucide-react';
+import {
+  Camera,
+  Gift,
+  Heart,
+  Music2,
+  Pause,
+  Rotate3D,
+  Sparkles,
+  Star,
+  Volume2,
+} from 'lucide-react';
 import './styles.css';
 
 const friendName = 'Pranay';
 const photoPath = 'https://res.cloudinary.com/kzrqz50e/image/upload/v1783195424/IMG_20260705_012657_bl6h3z.jpg';
+
+const birthdaySong = [
+  { frequency: 392, duration: 0.28 },
+  { frequency: 392, duration: 0.22 },
+  { frequency: 440, duration: 0.48 },
+  { frequency: 392, duration: 0.48 },
+  { frequency: 523.25, duration: 0.48 },
+  { frequency: 493.88, duration: 0.9 },
+  { frequency: null, duration: 0.18 },
+  { frequency: 392, duration: 0.28 },
+  { frequency: 392, duration: 0.22 },
+  { frequency: 440, duration: 0.48 },
+  { frequency: 392, duration: 0.48 },
+  { frequency: 587.33, duration: 0.48 },
+  { frequency: 523.25, duration: 0.9 },
+  { frequency: null, duration: 0.18 },
+  { frequency: 392, duration: 0.28 },
+  { frequency: 392, duration: 0.22 },
+  { frequency: 783.99, duration: 0.48 },
+  { frequency: 659.25, duration: 0.48 },
+  { frequency: 523.25, duration: 0.48 },
+  { frequency: 493.88, duration: 0.48 },
+  { frequency: 440, duration: 0.9 },
+  { frequency: null, duration: 0.18 },
+  { frequency: 698.46, duration: 0.28 },
+  { frequency: 698.46, duration: 0.22 },
+  { frequency: 659.25, duration: 0.48 },
+  { frequency: 523.25, duration: 0.48 },
+  { frequency: 587.33, duration: 0.48 },
+  { frequency: 523.25, duration: 1.1 },
+  { frequency: null, duration: 0.6 },
+];
+
+function playTone(audioContext, destination, frequency, duration) {
+  if (!frequency) {
+    return;
+  }
+
+  const startAt = audioContext.currentTime;
+  const oscillator = audioContext.createOscillator();
+  const noteGain = audioContext.createGain();
+
+  oscillator.type = 'triangle';
+  oscillator.frequency.setValueAtTime(frequency, startAt);
+  noteGain.gain.setValueAtTime(0.0001, startAt);
+  noteGain.gain.exponentialRampToValueAtTime(0.85, startAt + 0.025);
+  noteGain.gain.exponentialRampToValueAtTime(0.0001, startAt + Math.max(duration - 0.04, 0.05));
+
+  oscillator.connect(noteGain);
+  noteGain.connect(destination);
+  oscillator.start(startAt);
+  oscillator.stop(startAt + duration);
+}
 
 function Confetti() {
   return (
@@ -51,6 +114,129 @@ function CelebrationDecor() {
           }}
         />
       ))}
+    </div>
+  );
+}
+
+function MusicPlayer() {
+  const audioContextRef = React.useRef(null);
+  const masterGainRef = React.useRef(null);
+  const nextNoteTimerRef = React.useRef(null);
+  const noteIndexRef = React.useRef(0);
+  const isPlayingRef = React.useRef(false);
+  const [isPlaying, setIsPlaying] = React.useState(false);
+  const [autoplayBlocked, setAutoplayBlocked] = React.useState(false);
+
+  const stopMusic = React.useCallback(() => {
+    isPlayingRef.current = false;
+    setIsPlaying(false);
+
+    if (nextNoteTimerRef.current) {
+      window.clearTimeout(nextNoteTimerRef.current);
+      nextNoteTimerRef.current = null;
+    }
+  }, []);
+
+  const scheduleNextNote = React.useCallback(() => {
+    if (!isPlayingRef.current || !audioContextRef.current || !masterGainRef.current) {
+      return;
+    }
+
+    const note = birthdaySong[noteIndexRef.current];
+    playTone(audioContextRef.current, masterGainRef.current, note.frequency, note.duration);
+    noteIndexRef.current = (noteIndexRef.current + 1) % birthdaySong.length;
+    nextNoteTimerRef.current = window.setTimeout(scheduleNextNote, note.duration * 1000);
+  }, []);
+
+  const startMusic = React.useCallback(async () => {
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+
+    if (!AudioContext) {
+      setAutoplayBlocked(true);
+      return;
+    }
+
+    if (!audioContextRef.current) {
+      const audioContext = new AudioContext();
+      const masterGain = audioContext.createGain();
+      const delay = audioContext.createDelay();
+      const feedback = audioContext.createGain();
+
+      masterGain.gain.value = 0.18;
+      delay.delayTime.value = 0.16;
+      feedback.gain.value = 0.18;
+
+      masterGain.connect(audioContext.destination);
+      masterGain.connect(delay);
+      delay.connect(feedback);
+      feedback.connect(delay);
+      delay.connect(audioContext.destination);
+
+      audioContextRef.current = audioContext;
+      masterGainRef.current = masterGain;
+    }
+
+    try {
+      await audioContextRef.current.resume();
+      setAutoplayBlocked(false);
+      setIsPlaying(true);
+      isPlayingRef.current = true;
+
+      if (!nextNoteTimerRef.current) {
+        scheduleNextNote();
+      }
+    } catch {
+      stopMusic();
+      setAutoplayBlocked(true);
+    }
+  }, [scheduleNextNote, stopMusic]);
+
+  React.useEffect(() => {
+    const timer = window.setTimeout(startMusic, 350);
+    const unlockMusic = () => startMusic();
+
+    window.addEventListener('pointerdown', unlockMusic, { once: true });
+    window.addEventListener('keydown', unlockMusic, { once: true });
+
+    return () => {
+      window.clearTimeout(timer);
+      window.removeEventListener('pointerdown', unlockMusic);
+      window.removeEventListener('keydown', unlockMusic);
+      stopMusic();
+
+      if (audioContextRef.current) {
+        audioContextRef.current.close();
+        audioContextRef.current = null;
+      }
+    };
+  }, [startMusic, stopMusic]);
+
+  const toggleAudio = async () => {
+    if (isPlaying) {
+      stopMusic();
+      return;
+    }
+
+    await startMusic();
+  };
+
+  return (
+    <div className="music-player inline-flex items-center gap-3 rounded-full border border-white/18 bg-white/10 px-3 py-2 text-white backdrop-blur">
+      <button
+        type="button"
+        onClick={toggleAudio}
+        className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-[#ffdf80] text-[#251933] shadow-lg shadow-[#ffdf80]/25 transition hover:scale-105"
+        aria-label={isPlaying ? 'Pause birthday music' : 'Play birthday music'}
+      >
+        {isPlaying ? (
+          <Pause className="h-5 w-5" />
+        ) : (
+          <Volume2 className="h-5 w-5" />
+        )}
+      </button>
+      <span className="pr-2 text-sm font-semibold text-white/82">
+        {isPlaying ? 'Birthday song playing' : autoplayBlocked ? 'Tap to Start Music' : 'Starting song'}
+      </span>
     </div>
   );
 }
@@ -178,6 +364,10 @@ function App() {
               <Heart className="h-5 w-5 text-[#ff7aa2]" />
               See Memory
             </a>
+          </div>
+
+          <div className="mt-6">
+            <MusicPlayer />
           </div>
         </div>
 
