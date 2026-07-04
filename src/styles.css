@@ -1,0 +1,310 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  font-family: Inter, system-ui, sans-serif;
+  background: #140f24;
+}
+
+.hero-title {
+  animation: title-glow 3.8s ease-in-out infinite alternate;
+}
+
+.badge-pulse {
+  animation: soft-pulse 2.8s ease-in-out infinite;
+}
+
+.shine-button,
+.pulse-button,
+.wish-card,
+.memory-panel {
+  position: relative;
+  overflow: hidden;
+}
+
+.shine-button::before,
+.memory-panel::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(110deg, transparent 0%, rgba(255, 255, 255, 0.36) 45%, transparent 58%);
+  transform: translateX(-120%);
+  animation: shine-sweep 3.8s ease-in-out infinite;
+}
+
+.shine-button > *,
+.pulse-button > *,
+.memory-panel > * {
+  position: relative;
+  z-index: 1;
+}
+
+.pulse-button {
+  animation: button-breathe 2.6s ease-in-out infinite;
+}
+
+.spin-glow {
+  animation: glow-spin 8s linear infinite;
+}
+
+.photo-flip {
+  perspective: 1300px;
+}
+
+.photo-flip-inner {
+  transform-style: preserve-3d;
+  transition: transform 900ms cubic-bezier(0.2, 0.72, 0.22, 1);
+}
+
+.photo-flip:hover .photo-flip-inner,
+.photo-flip:focus-visible .photo-flip-inner,
+.photo-flip.is-flipped .photo-flip-inner {
+  transform: rotateY(180deg);
+}
+
+.photo-face {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.photo-back {
+  transform: rotateY(180deg);
+}
+
+.balloon {
+  position: absolute;
+  bottom: -140px;
+  left: var(--balloon-left);
+  width: var(--balloon-size);
+  height: calc(var(--balloon-size) * 1.25);
+  border-radius: 999px 999px 850px 850px;
+  background:
+    radial-gradient(circle at 34% 26%, rgba(255, 255, 255, 0.78), transparent 16px),
+    var(--balloon-color);
+  box-shadow: inset -10px -16px 24px rgba(0, 0, 0, 0.18);
+  opacity: 0.72;
+  animation: balloon-rise 13s ease-in-out infinite;
+  animation-delay: var(--balloon-delay);
+}
+
+.balloon::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 100%;
+  width: 1px;
+  height: 76px;
+  background: linear-gradient(rgba(255, 255, 255, 0.55), transparent);
+}
+
+.spark-dot {
+  position: absolute;
+  left: var(--spark-left);
+  top: var(--spark-top);
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: #ffdf80;
+  box-shadow: 0 0 18px #ffdf80, 0 0 28px rgba(125, 211, 252, 0.46);
+  animation: sparkle-pop 2.2s ease-in-out infinite;
+  animation-delay: var(--spark-delay);
+}
+
+.wish-card {
+  animation: card-enter 800ms cubic-bezier(0.2, 0.72, 0.22, 1) both;
+  animation-delay: var(--card-delay);
+  transition: transform 260ms ease, border-color 260ms ease, background 260ms ease;
+}
+
+.wish-card::after {
+  content: '';
+  position: absolute;
+  inset: auto 12% 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #ffdf80, #7dd3fc, transparent);
+  transform: scaleX(0);
+  transform-origin: center;
+  transition: transform 260ms ease;
+}
+
+.wish-card:hover {
+  transform: translateY(-10px);
+  border-color: rgba(255, 223, 128, 0.42);
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.wish-card:hover::after {
+  transform: scaleX(1);
+}
+
+.wish-card:hover .wish-icon {
+  animation: icon-wiggle 650ms ease;
+}
+
+.confetti-piece {
+  position: absolute;
+  top: -24px;
+  left: var(--x);
+  width: 10px;
+  height: 16px;
+  border-radius: 3px;
+  background: hsl(var(--hue) 86% 68%);
+  animation: confetti-fall var(--duration) linear infinite;
+  animation-delay: var(--delay);
+  opacity: 0.82;
+}
+
+.confetti-piece:nth-child(3n) {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+}
+
+.confetti-piece:nth-child(4n) {
+  width: 14px;
+  height: 7px;
+}
+
+@keyframes confetti-fall {
+  0% {
+    transform: translate3d(0, -12vh, 0) rotate(0deg);
+  }
+
+  100% {
+    transform: translate3d(42px, 112vh, 0) rotate(720deg);
+  }
+}
+
+@keyframes title-glow {
+  0% {
+    text-shadow: 0 0 0 rgba(255, 223, 128, 0);
+  }
+
+  100% {
+    text-shadow: 0 0 28px rgba(255, 223, 128, 0.32), 0 0 54px rgba(255, 122, 162, 0.18);
+  }
+}
+
+@keyframes soft-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 rgba(255, 223, 128, 0);
+  }
+
+  50% {
+    box-shadow: 0 0 32px rgba(255, 223, 128, 0.22);
+  }
+}
+
+@keyframes shine-sweep {
+  0%,
+  35% {
+    transform: translateX(-125%);
+  }
+
+  70%,
+  100% {
+    transform: translateX(125%);
+  }
+}
+
+@keyframes button-breathe {
+  0%,
+  100% {
+    box-shadow: 0 0 0 rgba(255, 122, 162, 0);
+  }
+
+  50% {
+    box-shadow: 0 0 28px rgba(255, 122, 162, 0.28);
+  }
+}
+
+@keyframes glow-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes balloon-rise {
+  0% {
+    transform: translate3d(0, 0, 0) rotate(-5deg);
+  }
+
+  50% {
+    transform: translate3d(20px, -56vh, 0) rotate(7deg);
+  }
+
+  100% {
+    transform: translate3d(-14px, -112vh, 0) rotate(-4deg);
+  }
+}
+
+@keyframes sparkle-pop {
+  0%,
+  100% {
+    transform: scale(0.4) rotate(0deg);
+    opacity: 0.15;
+  }
+
+  50% {
+    transform: scale(1.35) rotate(45deg);
+    opacity: 0.92;
+  }
+}
+
+@keyframes card-enter {
+  from {
+    transform: translateY(28px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes icon-wiggle {
+  0%,
+  100% {
+    transform: rotate(0deg) scale(1);
+  }
+
+  35% {
+    transform: rotate(-12deg) scale(1.08);
+  }
+
+  70% {
+    transform: rotate(10deg) scale(1.05);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .photo-flip:hover .photo-flip-inner,
+  .photo-flip:focus-visible .photo-flip-inner,
+  .photo-flip.is-flipped .photo-flip-inner {
+    transform: none;
+  }
+}
