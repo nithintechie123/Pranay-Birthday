@@ -282,6 +282,10 @@ function PhotoFrame() {
                 Birthday Star
               </p>
               <p className="photo-name font-display text-4xl text-white">{friendName}</p>
+              <div className="mt-4 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/12 px-4 py-2 text-sm font-semibold text-white/86 backdrop-blur">
+                <Rotate3D className="h-4 w-4 text-[#ffdf80]" />
+                Tap on card to flip
+              </div>
             </div>
           </div>
         </div>
