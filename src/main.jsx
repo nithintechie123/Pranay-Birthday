@@ -91,9 +91,11 @@ function PhotoFrame() {
                 </div>
               </div>
             )}
-            <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/62 to-transparent p-5">
-              <p className="text-sm uppercase tracking-[0.28em] text-white/72">Birthday Star</p>
-              <p className="font-display text-4xl text-white">{friendName}</p>
+            <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 via-black/58 to-transparent p-5">
+              <p className="photo-label text-sm font-bold uppercase tracking-[0.28em] text-[#ffdf80]">
+                Birthday Star
+              </p>
+              <p className="photo-name font-display text-4xl text-white">{friendName}</p>
             </div>
           </div>
         </div>
